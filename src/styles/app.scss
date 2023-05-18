@@ -1,0 +1,24 @@
+.App{
+    height: 100%;
+    display: block;
+    position: relative;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+@import "navbar";
+@import "footer";
+@import "card";
+@import "main";
+@import "pagination";
+@import "detail";
+@import "popup";
+@import "login";

@@ -1,25 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useRef } from "react";
+//import styles
+import "./styles/app.scss";
+
+
+//import router
+import { BrowserRouter as Router, Route, Switch, Routes } from 'react-router-dom';
+
+//import pages
+import LoginPage from "./pages/Login";
+import MainPage from "./pages/Main";
+import DetailPage from "./pages/Detail";
+import ProtectedRoute from "./components/protectedRoute";
+import NavbarComp from "./components/NavbarComp";
+import FooterComp from "./components/FooterComp";
 
 function App() {
+  const [data, setData] = useState([{}])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div class="App">
+
+      <Router>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/detail" element={<DetailPage/>} />
+          {/* <Route path="/detail" exact component={() => <DetailPage />} /> */}
+          {/* <Route path="/Main" element={<ProtectedRoute exact component={() => <MainPage />} />}  exact component={() => <LoginPage />} /> */}
+        </Routes>
+      </Router>
     </div>
-  );
-}
+  )
+};
 
 export default App;
