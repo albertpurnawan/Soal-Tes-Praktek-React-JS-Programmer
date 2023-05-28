@@ -1,24 +1,27 @@
+import { useState } from "react";
 import { Pagination } from "react-bootstrap";
-const PaginationComp = () => {
+const PaginationComp = ({ perpage, length, paginate }) => {
+  const [active, setActive] = useState(0);
+  let items = [];
+   items.push(
+     <Pagination.Item key={0} active={0 === active} onClick={() => { setActive(0); paginate('all') }}>
+      ALL
+    </Pagination.Item>,
+    
+  );
+  for (let number = 1; number <= Math.ceil(length/perpage); number++) {
+  items.push(
+    <Pagination.Item key={number} active={number === active} onClick={() => { setActive(number); paginate(number) }}>
+      {number}
+    </Pagination.Item>,
+    
+  );
+}
   return (
     <div class="pagination">
-      <Pagination>
-                <Pagination.First />
-                <Pagination.Prev />
-                <Pagination.Item>{1}</Pagination.Item>
-                <Pagination.Ellipsis />
-
-                <Pagination.Item>{10}</Pagination.Item>
-                <Pagination.Item>{11}</Pagination.Item>
-                <Pagination.Item active>{12}</Pagination.Item>
-                <Pagination.Item>{13}</Pagination.Item>
-                <Pagination.Item disabled>{14}</Pagination.Item>
-
-                <Pagination.Ellipsis />
-                <Pagination.Item>{20}</Pagination.Item>
-                <Pagination.Next />
-                <Pagination.Last />
-            </Pagination>
+      <Pagination >
+        {items}
+      </Pagination>
     </div>
   );
 };

@@ -9,7 +9,6 @@ import { BrowserRouter as Router, Route, Switch, Routes } from 'react-router-dom
 //import pages
 import LoginPage from "./pages/Login";
 import MainPage from "./pages/Main";
-import DetailPage from "./pages/Detail";
 import ProtectedRoute from "./components/protectedRoute";
 import NavbarComp from "./components/NavbarComp";
 import FooterComp from "./components/FooterComp";
@@ -23,7 +22,6 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/detail" element={<DetailPage/>} />
           {/* <Route path="/detail" exact component={() => <DetailPage />} /> */}
           {/* <Route path="/Main" element={<ProtectedRoute exact component={() => <MainPage />} />}  exact component={() => <LoginPage />} /> */}
         </Routes>

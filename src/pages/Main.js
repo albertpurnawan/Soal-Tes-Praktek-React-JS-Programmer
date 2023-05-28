@@ -1,166 +1,195 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import NavbarComp from '../components/NavbarComp';
 import FooterComp from '../components/FooterComp';
 import ProductComp from '../components/ProductComp';
 import PaginationComp from '../components/PaginationComp';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import Popup from '../components/PopupComp';
-import * as formik from 'formik';
+import { useFormik } from "formik";
 import * as yup from 'yup';
-function Addlist({ setData, isAdd, togglePopup, schema, validated}) {
-    function HandleSubmit(event) {
-        const gambar = event.target.elements.name.gambar;
-        const nama = event.target.elements.name.nama;
-        const hargabeli = event.target.elements.name.hargabeli;
-        const hargajual = event.target.elements.name.hargajual;
-        const stock = event.target.elements.name.stock;
-        const newData = {
-            id: 4,
-            gambar,
-            nama,
-            hargabeli,
-            hargajual,
-            stock
+import { uid } from 'uid';
+import { Link } from 'react-router-dom';
+import produk from '../data/produk';
+import DetailComp from '../components/DetailComp';
+    
+
+function Addlist({isAdd,setisAdd,Produk,togglePopupAdd}) {
+    const [gambar, setGambar] = useState("");
+    const [nama, setNama] = useState("");
+    const [hargabeli, setHargabeli] = useState(0);
+    const [hargajual, setHargajual] = useState(0);
+    const [stock, setStock] = useState(0);
+    
+    const [isGambar, setIsGambar] = useState(false);
+    const [isNama, setIsNama] = useState(false);
+    const [isHargabeli, setIsHargabeli] = useState(false);
+    const [isHargajual, setIsHargajual] = useState(false);
+    const [isStock, setIsStock] = useState(false);
+    
+    const [validated, setValidated] = useState(true);
+    const MAX_FILE_SIZE = 100000; //100KB
+    const SUPPORTED_FORMATS = ['image/jpeg', 'image/png'];
+
+
+    const checkerGambar = (e) => {
+        let file = e.target.files[0];
+        console.log(file);
+        if (file && !file.name) {
+            
+            setIsGambar(false);
+        }else
+        if (file.size > MAX_FILE_SIZE) {
+            
+            setIsGambar(false);
+        }else
+        if (!SUPPORTED_FORMATS.includes(file.type)) {
+            
+            setIsGambar(false);
+        } else {
+            setIsGambar(true);
         }
-        setData((lastData) => {
-            return lastData.concat()
-        })
+        
+    }
+    const checkerNama = (e) => {
+        let value = e.target.value;
+        if (value === "") {
+            setIsNama(false);
+        } else {
+            const duplicate = Produk.filter((item) => item.nama === value);
+            if (duplicate.length === 1) {
+                console.log(duplicate);
+                setIsNama(false);
+            } else {
+                setIsNama(true);
+            }
+        }
+        
+    }
+    const checkerNumber = (e) => {
+        let value = e.target.value;
+        if (/\d/.test(value)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        if (isGambar && isNama && isHargabeli && isHargajual && isStock) {
+            const id = uid;
+            const modelData = {
+                id: id,
+                gambar: gambar,
+                nama: nama,
+                hargabeli: hargabeli,
+                hargajual: hargajual,
+                stock: stock
+            }
+            Produk.push(modelData)
+            alert("Input Success");
+        } else {
+            alert("Input Failed");
+        }
+        setisAdd(false);
     }
     return (
-        <div>
-            <Button className="addbutton" variant="success" size="lg" onClick={!isAdd ? togglePopup : togglePopup}>Add +</Button>
-                {isAdd && <Popup
-                    content={<>
-                                    <h3><b>Add produk</b></h3>
-                    <formik.Formik
-                        validationSchema={schema}
-                        onSubmit={console.log}
-                        initialValues={{
-                            id: 3,
-                            gambar: "gambar3.jpg",
-                            nama: "Produk 3",
-                            hargabeli: 20,
-                            hargajual: 30,
-                            stock: 15
-                        }}
-                    >
-                    {({ handleChange, errors }) => (
-                    <Form class="form d-flex " noValidate validated={validated} onSubmit={HandleSubmit}>
-                        <Form.Group class="formGroup" controlId="formSearch">
-                            <div>
-                                <p>Pilih gambar produk</p>
-                                <Form.Control class="form-control me-2  mb-2" name="gambar" onChange={handleChange} isInvalid={!!errors.gambar} type="file" required />
-                            </div>
-                            <div>
-                                <p>Nama produk</p>
-                                <Form.Control class="form-control me-2  mb-2" size="lg" name="nama" onChange={handleChange} isInvalid={!!errors.nama} type="text" defaultValue="" required />
-                            </div>
-                            <div>
-                                <p>Harga beli produk</p><Form.Control class="form-control me-2  mb-2" size="lg" name="hargabeli" onChange={handleChange} isInvalid={!!errors.hargabeli} type="number" defaultValue="0" required />
-                            </div>
-                            <div>
-                                <p>harga jual produk</p><Form.Control class="form-control me-2  mb-2" size="lg" name="hargajual" onChange={handleChange} isInvalid={!!errors.hargajual} type="number" defaultValue="0" required />
-                            </div>
-                            <div>
-                                <p>Stock produk</p><Form.Control class="form-control me-2 mb-2" size="lg" name="stock" onChange={handleChange} isInvalid={!!errors.stock} type="number" defaultValue="0" required />
-                            </div>
-                        </Form.Group>
-                    <div class="popupbutton">
-                    <Button variant="success" size="lg" type="submit">Add</Button>{' '}
-                    <Button variant="primary" size="lg" onClick={isAdd ? togglePopup : null}>Cancel</Button>{' '}
+        <div class="popupform">
+            <h3><b>Add produk</b></h3>
+            <Form class="form d-flex" noValidate validated={validated}>
+                <Form.Group class="formGroup" controlId="formSearch">
+                    <div>
+                        <p style={{ verticalAlign: 'baseline', display: 'inline' }}>Pilih gambar produk</p>
+                        <Form.Control class="form-control" name="gambar" onChange={(e) => { setGambar(e.target.files[0].name); checkerGambar(e); }} type="file" required/>
+                        {/* <Form.Control.Feedback type="invalid">Format Correct.</Form.Control.Feedback> */}
+                        {!isGambar ? <p style={{color: 'red'}}>Please Select File Below 100kb and with Extension jpg or png.</p> : null}
                     </div>
-                                        </Form>
-                )}
-                </formik.Formik>
-                </>}
-                handleClose={togglePopup}
-                />}
+                    <div>
+                        <p style={{ verticalAlign: 'baseline', display: 'inline' }}>Nama produk</p>
+                        <Form.Control class="form-control me-2  mb-2" size="lg" name="nama" onChange={(e) => { setNama(e.target.value); checkerNama(e); }}  type="text" defaultValue="" required/>
+                        {!isNama ? <p style={{color: 'red'}}>Please Input Nama Produk Baru.</p> : null}
+                    </div>
+                    <div>
+                        <p style={{ verticalAlign: 'baseline', display: 'inline' }}>Harga beli produk</p>
+                        <Form.Control class="form-control me-2  mb-2" size="lg" name="hargabeli" onChange={(e) => { setHargabeli(e.target.value); setIsHargabeli(checkerNumber(e)); }}  type="number" defaultValue="" required />
+                        {!isHargabeli ? <p style={{color: 'red'}}>Please Input Harga Beli Produk with Number Only.</p> : null}
+                    </div>
+                    <div>
+                        <p style={{ verticalAlign: 'baseline', display: 'inline' }}>Harga jual produk</p>
+                        <Form.Control class="form-control me-2  mb-2" size="lg" name="hargajual" onChange={(e) => { setHargajual(e.target.value); setIsHargajual(checkerNumber(e)); }}  type="number" defaultValue="" required />
+                        {!isHargajual ? <p style={{color: 'red'}}>Please Input Harga Jual Produk with Number Only.</p> : null}
+                    </div>
+                    <div>
+                        <p style={{ verticalAlign: 'baseline', display: 'inline' }}>Stock produk</p>
+                        <Form.Control class="form-control me-2 mb-2" size="lg" name="stock" onChange={(e) => { setStock(e.target.value); setIsStock(checkerNumber(e)); }}  type="number" defaultValue="" required />
+                        {!isStock ? <p style={{color: 'red'}}>Please Input Stock with Number Only.</p> : null}
+                    </div>
+                </Form.Group>
+                <div class="popupbutton">
+                    <Button variant="success" size="lg" type='submit' onClick={(e) => handleSubmit(e)}>Add</Button>{' '}
+                    <Button variant="primary" size="lg" onClick={isAdd ? togglePopupAdd : null}>Cancel</Button>{' '}
+                </div>
+            </Form>
         </div>
     )
 }
 function MainPage() {
+    
+    const [Produk, setProduk] = useState(produk);
+    const [tempProduk, setTempProduk] = useState(Produk);
     const [isAdd, setisAdd] = useState(false);
-    const togglePopup = () => {
+    const [isDet, setisDet] = useState(false);
+    const togglePopupAdd = () => {
         setisAdd(!isAdd);
     }
-
-const listData = [
-  {
-    id: 1,
-    gambar: "https://assets.pikiran-rakyat.com/crop/0x0:0x0/x/photo/2020/08/23/3492973024.png",
-    nama: "Produk 1",
-    hargabeli: 10,
-    hargajual: 15,
-    stock: 20
-  },
-  {
-    id: 2,
-    gambar: "https://press.ikidane-nippon.com/wordpress/wp-content/uploads/2021/04/1-1.jpg",
-    nama: "Produk 2",
-    hargabeli: 5,
-    hargajual: 8,
-    stock: 10
-  },
-  {
-    id: 3,
-    gambar: "https://static.sehatq.com/content/review/product/image/767120211206100834.jpeg",
-    nama: "Produk 3",
-    hargabeli: 20,
-    hargajual: 30,
-    stock: 15
-  }
-    ];
-    
-    const [data, setData] = useState(listData)
-
-      const [validated, setValidated] = useState(false);
-
-    const handleSubmit = (event) => {
-        const form = event.currentTarget;
-        console.log(form);
-        if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
+    const togglePopupDet = () => {
+        setisDet(!isDet);
+    }
+    const paginate = (number) => {
+        if (number !== 'all') {
+            const perPage = 3;
+            const firstIndexProduk = (number * perPage) - 3;
+            const lastIndexProduk = (number * perPage);
+            setTempProduk(Produk.slice(firstIndexProduk,lastIndexProduk));
+        } else {
+            setTempProduk(Produk);
         }
-
-        setValidated(true);
-    };
-    const MAX_FILE_SIZE = 102400; //100KB
-    const SUPPORTED_FORMATS = ['image/jpg', 'image/png'];
-    
-
-    const schema = yup.object().shape({
-        id: yup.string().required(),
-        gambar: yup
-      .mixed()
-      .required('A file is required')
-      .test('file size',
-        'upload file', (value) => !value || (value && value.size <= MAX_FILE_SIZE))
-      .test('format',
-        'upload file', (value) => !value || (value && SUPPORTED_FORMATS.includes(value.type))),
-        nama: yup.string().required(),
-        hargabeli: yup.number().required(),
-        hargajual: yup.number().required(),
-        stock: yup.number().required()
-    });
-
-
+        
+    }
     return (
         <div>
-            <NavbarComp />
+            <NavbarComp Produk={Produk} setProduk={setProduk} setTempProduk={setTempProduk} />
             <div class="main">
-                <Addlist setData={setData} isAdd={isAdd} togglePopup={togglePopup} schema={schema} validated={ validated} />
+                <Button className="addbutton" variant="success" size="lg" onClick={!isAdd ? togglePopupAdd : togglePopupAdd}>Add +</Button>
+                {isAdd && <Popup
+                    content={<>
+                        <Addlist isAdd={isAdd} setisAdd={setisAdd} Produk={Produk} togglePopupAdd={ togglePopupAdd}/>
+                    </>}
+                    handleClose={togglePopupAdd}
+                />}
                 <Row>
                 {
-                    data.map((current) => (
-                        <Col><ProductComp id={current.id} gambar={current.gambar} hargabeli={current.hargabeli} hargajual={current.hargajual} nama={current.nama} stock={current.stock} /></Col>
+                    tempProduk.map((current) => (
+                        <Col>
+                            {isDet && <Popup
+                                content={<>
+                                    <div class="detailpage">
+                                        <DetailComp id={current.id} gambar={current.gambar} hargabeli={current.hargabeli} hargajual={current.hargajual} nama={current.nama} stock={current.stock} setisDet={setisDet} Produk={Produk} setProduk={setProduk} setTempProduk={setTempProduk} />
+                                    </div>
+                                </>}
+                                id={current.id} gambar={current.gambar} hargabeli={current.hargabeli} hargajual={current.hargajual} nama={current.nama} stock={current.stock} handleClose={togglePopupDet}
+                            />}
+                            <Link onClick={!isDet ? togglePopupDet : togglePopupDet}>
+                                <ProductComp id={current.id} gambar={current.gambar} hargabeli={current.hargabeli} hargajual={current.hargajual} nama={current.nama} stock={current.stock} />
+                            </Link>
+                        </Col>
                     ))
                 }
                 </Row>
                 
             </div>
             <br/>
-            <PaginationComp />
+            <PaginationComp perpage={3} length={Produk.length} paginate={paginate}/>
             <br/>
             <FooterComp />
         </div>

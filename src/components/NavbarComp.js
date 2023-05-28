@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCircleUser } from "@fortawesome/free-solid-svg-icons";
 // import Logout from "./Logout";
-import { Navbar, Nav, Form } from "react-bootstrap";
-const NavbarComp = () => {
+import { Navbar, Nav, Form, Button } from "react-bootstrap";
+const NavbarComp = ({ Produk, setProduk, setTempProduk}) => {
+  const [search, setSearch] = useState("");
+    const [list, setList] = useState(Produk);
+  const handleSearch = (event) => {
+    event.preventDefault();
+    console.log(list);
+    const newList = list.filter((item) => 
+      item.nama.toLowerCase().includes(search)
+    );
+    // setProduk(newList);
+    setTempProduk(newList);
+  }
   return (
     <div>
       <Navbar class="navbar">
@@ -13,15 +24,12 @@ const NavbarComp = () => {
             <Navbar.Brand>Stock Gudang</Navbar.Brand>
           </Nav>
           <Nav class="search">
-            <Form class="form d-flex " role="search">
-              <Form.Group class="formGroup" controlId="formSearch">
-                <Form.Control class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+            <Form className="form d-flex col">
+              <Form.Group class="formGroup">
+                <Form.Control class="form-control me-2" type="text" placeholder="Search" aria-label="Search" onChange={(e) => {setSearch(e.target.value)}} onKeyUp={(e) => { handleSearch(e)}}/>
               </Form.Group>
-              </Form>
-            {/* <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-success" type="submit">Search</button>
-            </form> */}
+              <Button className="ms-4" onClick={(e) => { handleSearch(e)}}>Search</Button>
+            </Form>
           </Nav>
           <Nav>
             <Nav.Link><FontAwesomeIcon icon={faCircleUser} /></Nav.Link>
